@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Loop",
+  "version": "1.1",
+  "description": "Loop a specific time range on YouTube videos.",
+  "host_permissions": ["<all_urls>"],
+  
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/watch*"],
+      "js": ["content.js"]
+    }
+  ]
+}
