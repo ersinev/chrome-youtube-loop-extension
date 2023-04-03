@@ -9,8 +9,14 @@ const checkForPlayer = setInterval(() => {
     loopControls.style.left = "10px";
     loopControls.style.zIndex = "9999";
     loopControls.innerHTML = `
-      <button id="loop-start">Start Loop</button>
-      <button id="loop-end">End Loop</button>
+      <label for="loop-start-time">Start Time:</label>
+      <input type="text" id="loop-start-time">
+      <button id="loop-start">Set Start Time</button>
+      <br>
+      <label for="loop-end-time">End Time:</label>
+      <input type="text" id="loop-end-time">
+      <button id="loop-end">Set End Time</button>
+      <br>
       <button id="loop-toggle">Loop</button>
     `;
 
@@ -28,9 +34,11 @@ const checkForPlayer = setInterval(() => {
     // Add event listeners to loop controls
     document.getElementById("loop-start").addEventListener("click", () => {
       loopStart = videoPlayer.currentTime;
+      document.getElementById("loop-start-time").value = formatTime(loopStart);
     });
     document.getElementById("loop-end").addEventListener("click", () => {
       loopEnd = videoPlayer.currentTime;
+      document.getElementById("loop-end-time").value = formatTime(loopEnd);
     });
     document.getElementById("loop-toggle").addEventListener("click", () => {
       if (isLooping) {
@@ -39,14 +47,12 @@ const checkForPlayer = setInterval(() => {
         videoPlayer.loop = false;
         isLooping = false;
         document.getElementById("loop-toggle").innerText = "Loop";
-        videoPlayer.removeEventListener("timeupdate", checkLoop);
       } else {
         // Enable loop
         videoPlayer.currentTime = loopStart;
-        videoPlayer.loop = false;
+        videoPlayer.loop = true;
         isLooping = true;
         document.getElementById("loop-toggle").innerText = "Stop";
-        videoPlayer.addEventListener("timeupdate", checkLoop);
       }
     });
 
@@ -57,11 +63,11 @@ const checkForPlayer = setInterval(() => {
       }
     });
 
-    // Event listener to check if video is outside loop
-    function checkLoop() {
-      if (videoPlayer.currentTime >= loopEnd) {
-        videoPlayer.currentTime = loopStart;
-      }
+    // Format time as mm:ss
+    function formatTime(time) {
+      const minutes = Math.floor(time / 60);
+      const seconds = Math.floor(time % 60);
+      return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     }
   }
 }, 500);
