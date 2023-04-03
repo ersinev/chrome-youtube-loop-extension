@@ -26,58 +26,27 @@ const checkForPlayer = setInterval(() => {
     let isLooping = false;
 
     // Add event listeners to loop controls
-    const loopStartButton = document.getElementById("loop-start");
-    const loopEndButton = document.getElementById("loop-end");
-    const loopToggleButton = document.getElementById("loop-toggle");
-    
-    let isDraggingStart = false;
-    let isDraggingEnd = false;
-    let startOffsetX = 0;
-    let endOffsetX = 0;
-    
-    loopStartButton.addEventListener("mousedown", (event) => {
-      isDraggingStart = true;
-      startOffsetX = event.offsetX;
+    document.getElementById("loop-start").addEventListener("click", () => {
+      loopStart = videoPlayer.currentTime;
     });
-    
-    loopEndButton.addEventListener("mousedown", (event) => {
-      isDraggingEnd = true;
-      endOffsetX = event.offsetX;
+    document.getElementById("loop-end").addEventListener("click", () => {
+      loopEnd = videoPlayer.currentTime;
     });
-
-    document.addEventListener("mousemove", (event) => {
-      if (isDraggingStart) {
-        loopStartButton.style.left = `${event.clientX - startOffsetX}px`;
-      }
-      if (isDraggingEnd) {
-        loopEndButton.style.left = `${event.clientX - endOffsetX}px`;
-      }
-    });
-
-    document.addEventListener("mouseup", () => {
-      if (isDraggingStart) {
-        loopStart = videoPlayer.currentTime + (loopStartButton.offsetLeft / loopStartButton.parentElement.offsetWidth) * videoPlayer.duration;
-        isDraggingStart = false;
-      }
-      if (isDraggingEnd) {
-        loopEnd = videoPlayer.currentTime + (loopEndButton.offsetLeft / loopEndButton.parentElement.offsetWidth) * videoPlayer.duration;
-        isDraggingEnd = false;
-      }
-    });
-
-    loopToggleButton.addEventListener("click", () => {
+    document.getElementById("loop-toggle").addEventListener("click", () => {
       if (isLooping) {
         // Disable loop
         videoPlayer.currentTime = loopStart;
         videoPlayer.loop = false;
         isLooping = false;
-        loopToggleButton.innerText = "Loop";
+        document.getElementById("loop-toggle").innerText = "Loop";
+        videoPlayer.removeEventListener("timeupdate", checkLoop);
       } else {
         // Enable loop
         videoPlayer.currentTime = loopStart;
-        videoPlayer.loop = true;
+        videoPlayer.loop = false;
         isLooping = true;
-        loopToggleButton.innerText = "Stop";
+        document.getElementById("loop-toggle").innerText = "Stop";
+        videoPlayer.addEventListener("timeupdate", checkLoop);
       }
     });
 
@@ -87,5 +56,12 @@ const checkForPlayer = setInterval(() => {
         videoPlayer.currentTime = loopStart;
       }
     });
+
+    // Event listener to check if video is outside loop
+    function checkLoop() {
+      if (videoPlayer.currentTime >= loopEnd) {
+        videoPlayer.currentTime = loopStart;
+      }
+    }
   }
 }, 500);
